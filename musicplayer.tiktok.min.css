@@ -45,6 +45,9 @@ body::-webkit-scrollbar {
   background-color: #000;
   opacity: 0.7;
 }
+#tiktok-music-wrapper.visibility{
+  right: 0;
+}
 #tiktok-music-wrapper::before,
 .player-header {
   align-items: center;
