@@ -30,8 +30,7 @@ body::-webkit-scrollbar {
   width: 370px;
   z-index: 999;
 }
-#tiktok-music-wrapper::before {
-  content: "";
+#btn-open {
   width: 35px;
   height: 35px;
   justify-content: center;
@@ -48,10 +47,10 @@ body::-webkit-scrollbar {
 #tiktok-music-wrapper.visibility{
   right: 0;
 }
-#tiktok-music-wrapper.visibility::before{
+#btn-open.visibility{
   background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMjQgMjAuMTg4bC04LjMxNS04LjIwOSA4LjItOC4yODItMy42OTctMy42OTctOC4yMTIgOC4zMTgtOC4zMS04LjIwMy0zLjY2NiAzLjY2NiA4LjMyMSA4LjI0LTguMjA2IDguMzEzIDMuNjY2IDMuNjY2IDguMjM3LTguMzE4IDguMjg1IDguMjAzeiIvPjwvc3ZnPg==");
 }
-#tiktok-music-wrapper::before,
+#btn-open,
 .player-header {
   align-items: center;
   display: flex;
