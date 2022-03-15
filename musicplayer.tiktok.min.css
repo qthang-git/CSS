@@ -92,6 +92,9 @@ body::-webkit-scrollbar {
   transition: left 0.35s ease;
   z-index: 9999;
 }
+.tiktok-music-overlay.visibility{
+  display: block;
+}
 #button-close {
   -webkit-tap-highlight-color: transparent;
   background-color: transparent;
