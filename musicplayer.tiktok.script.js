@@ -15,10 +15,9 @@
 (function () {
   "use strict";
   const body = "body";
-  importStyleCss(
-    `https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css`
-  );
-  // importStyleCss(`https://pro.fontawesome.com/releases/v5.10.0/css/all.css`)
+  // importStyleCss(
+  //   `https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css`
+  // );
   importLink(
     "css",
     `https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css`,
@@ -29,19 +28,24 @@
     `https://pro.fontawesome.com/releases/v5.10.0/css/all.css`,
     `sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p`
   );
+  importStyleCss(
+    `https://raw.githubusercontent.com/qthang-git/userscripts/main/musicplayer.tiktok.min.css`
+  );
+  importLink(
+    "js",
+    `https://code.jquery.com/jquery-3.3.1.slim.min.js`,
+    `sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo`
+  );
+  importLink(
+    "js",
+    `https://code.jquery.com/jquery-3.3.1.min.js`,
+    `sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=`
+  );
   importLink(
     "js",
     `https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js`,
     `sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM`
-  );
-  importLink(
-    "js",
-    `https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js`,
-    ``
-  );
-  importStyleCss(
-    `https://raw.githubusercontent.com/qthang-git/userscripts/main/musicplayer.tiktok.min.css`
-  );
+  );  
   initUI();
   importJs();
 
@@ -71,6 +75,7 @@
     const root = `
     <div class="tiktok-music-overlay"></div>
     <div id="tiktok-music-wrapper">
+        <div id="btn-open"></div>
         <div class="player-header">            
             <div class="thumbnail rounded-circle">
                 <svg width="28" height="32" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
@@ -92,7 +97,7 @@
                 </button>
                 <div class="" id="div-config">
                     <div>
-                        <button class="button button-close" type="button">
+                        <button class="button" type="button" id="button-close">
                             <svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"
                                 data-svg="close-icon">
                                 <line fill="none" stroke="#999" stroke-width="1.1" x1="1" y1="1" x2="13" y2="13"></line>
@@ -242,7 +247,7 @@
         </div>
     </div>
     `;
-    $(btnUI).appendTo(body);
+    //$(btnUI).appendTo(body);
     $(root).appendTo(body);
     console.log("inject");
   }
@@ -290,6 +295,28 @@
 
   function importJs() {
     const inject = `
+    const frameUI = document.getElementById('tiktok-music-wrapper');
+    const btnUI = document.getElementById('btn-open');
+    btnUI.onclick = function(){
+      btnUI.classList.toggle('visibility');
+      frameUI.classList.toggle('visibility');
+    }
+    const btnOpenConfig = document.getElementById('button-config');
+    const btnCloseConfig = document.getElementById('button-close');
+    const overlayClick = document.querySelector('.tiktok-music-overlay');
+    btnOpenConfig.onclick = function (){
+      document.querySelector('#div-config').classList.toggle('show');
+      document.querySelector('.tiktok-music-overlay').classList.toggle('visibility');
+    };
+    closeConfig(btnCloseConfig);
+    closeConfig(overlayClick);
+    
+    function closeConfig (ele){
+      ele.onclick = function (){
+        document.querySelector('#div-config').classList.remove('show');
+        document.querySelector('.tiktok-music-overlay').classList.remove('visibility');
+      }
+    };
     const listSong = document.querySelectorAll('.music-item');
     listSong.forEach(item => item.addEventListener('click', () => {
       const el = document.querySelector('.music-item.playing');
@@ -314,6 +341,19 @@
         thumbnail.style.animationPlayState = 'paused';
         playPauseSong.innerHTML = "<span><i class='fas fa-play'></i></span>"
       } 
+    };
+    const randomSong = document.getElementById('random-song')
+    randomSong.onclick = function(){
+      randomSong.getAttribute('data-control-random') === "disable" ? randomSong.setAttribute('data-control-random','enable') : randomSong.setAttribute('data-control-random','disable');
+    };
+    const repeatSong = document.getElementById('repeat-song')
+    repeatSong.onclick = function(){
+      repeatSong.getAttribute('data-control-repeat') === "disable" ? repeatSong.setAttribute('data-control-repeat','all') : repeatSong.getAttribute('data-control-repeat') === "all" ? repeatSong.setAttribute('data-control-repeat','again') : repeatSong.setAttribute('data-control-repeat','disable');
+      if(repeatSong.getAttribute('data-control-repeat') === "again"){
+        repeatSong.innerHTML = '<span><i class="fas fa-repeat-1"></i></span>';
+      }else{
+        repeatSong.innerHTML = '<span><i class="fas fa-repeat"></i></span>';
+      }
     };
     `;
     var script = window.document.createElement("script");
