@@ -92,7 +92,7 @@ body::-webkit-scrollbar {
   transition: left 0.35s ease;
   z-index: 9999;
 }
-.button-close {
+#button-close {
   -webkit-tap-highlight-color: transparent;
   background-color: transparent;
   padding: 5px 10px;
