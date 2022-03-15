@@ -31,6 +31,7 @@
   importStyleCss(
     `https://raw.githubusercontent.com/qthang-git/userscripts/main/musicplayer.tiktok.min.css`
   );
+  initUI();
   importLink(
     "js",
     `https://code.jquery.com/jquery-3.3.1.slim.min.js`,
@@ -46,7 +47,6 @@
     `https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js`,
     `sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM`
   );  
-  initUI();
   importJs();
 
   function initUI() {
@@ -106,10 +106,10 @@
                         </button>
                         <div class="config-wrapper">
                             <label>X-RapidAPI-Host</label>
-                            <input type="text">
+                            <input type="text" id="api-host">
                             <label>X-RapidAPI-Key</label>
-                            <input type="text">
-                            <button type="button" class="button button-save-config">SAVE</button>
+                            <input type="text" id="api-key">
+                            <button type="button" class="button button-save-config" onclick="saveConfig()">SAVE</button>
                         </div>
                     </div>
                 </div>
@@ -169,7 +169,10 @@
                         <div class="player-timeline"></div>
                     </div>
                 </div>
-                <div class="playlist" >
+                <div class="playlist">
+                    <div class="d-flex justify-content-center align-items-center p-3 mb-2">
+                      <button class="button bg-transparent border p-2 text-white" id="btn-get-song">Get List Song</button>
+                    </div>
                     <ul class="music-list m-0 p-0">
                         <li class="music-item">
                             <div class="music-item-wrapper">
@@ -297,26 +300,59 @@
     const inject = `
     const frameUI = document.getElementById('tiktok-music-wrapper');
     const btnUI = document.getElementById('btn-open');
-    btnUI.onclick = function(){
-      btnUI.classList.toggle('visibility');
-      frameUI.classList.toggle('visibility');
-    }
     const btnOpenConfig = document.getElementById('button-config');
     const btnCloseConfig = document.getElementById('button-close');
     const overlayClick = document.querySelector('.tiktok-music-overlay');
+    
+    function closeConfig (){
+        document.querySelector('#div-config').classList.remove('show');
+        document.querySelector('.tiktok-music-overlay').classList.remove('visibility');
+    };
+    
+    btnUI.onclick = function(){
+      btnUI.classList.toggle('visibility');
+      frameUI.classList.toggle('visibility');
+      loadConfig();
+      if(!frameUI.classList.contains('visibility')){
+            closeConfig();      
+      }
+    }
+    
     btnOpenConfig.onclick = function (){
       document.querySelector('#div-config').classList.toggle('show');
       document.querySelector('.tiktok-music-overlay').classList.toggle('visibility');
     };
-    closeConfig(btnCloseConfig);
-    closeConfig(overlayClick);
     
-    function closeConfig (ele){
-      ele.onclick = function (){
-        document.querySelector('#div-config').classList.remove('show');
-        document.querySelector('.tiktok-music-overlay').classList.remove('visibility');
+    btnCloseConfig.onclick = function(){
+      closeConfig();
+    }
+    
+    overlayClick.onclick = function(){
+      closeConfig();
+    }
+    
+    function loadConfig(){
+      const api = JSON.parse(localStorage.getItem('apiConfig'));
+      document.querySelector('#api-host').value = api.host;
+      document.querySelector('#api-key').value = api.key;
+    }
+    
+    function saveConfig(){
+      const apiHost = document.getElementById('api-host');
+      const apiKey = document.getElementById('api-key');
+      if(apiHost.value === '' || apiKey.value === ''){
+        alert('Value not empty');
+        apiHost.value === '' ? apiHost.focus() : apiKey.focus();
       }
-    };
+      const apiInfor = {
+        host: apiHost.value,
+        key: apiKey.value
+      }
+      localStorage.setItem('apiConfig', JSON.stringify(apiInfor));
+      alert('Đã lưu! Nhấn OK để tải lại trang!');
+      location.reload();
+    }
+    
     const listSong = document.querySelectorAll('.music-item');
     listSong.forEach(item => item.addEventListener('click', () => {
       const el = document.querySelector('.music-item.playing');
@@ -330,6 +366,7 @@
       childEle.innerHTML = '<i class="action-play-icon"></i>'
       item.childNodes[1].appendChild(childEle);
     }));
+    
     const playPauseSong = document.getElementById('main-player');
     playPauseSong.onclick = function(){
       const thumbnail = document.querySelector('.play-song .thumbnail');
@@ -341,11 +378,13 @@
         thumbnail.style.animationPlayState = 'paused';
         playPauseSong.innerHTML = "<span><i class='fas fa-play'></i></span>"
       } 
+      
     };
     const randomSong = document.getElementById('random-song')
     randomSong.onclick = function(){
       randomSong.getAttribute('data-control-random') === "disable" ? randomSong.setAttribute('data-control-random','enable') : randomSong.setAttribute('data-control-random','disable');
     };
+    
     const repeatSong = document.getElementById('repeat-song')
     repeatSong.onclick = function(){
       repeatSong.getAttribute('data-control-repeat') === "disable" ? repeatSong.setAttribute('data-control-repeat','all') : repeatSong.getAttribute('data-control-repeat') === "all" ? repeatSong.setAttribute('data-control-repeat','again') : repeatSong.setAttribute('data-control-repeat','disable');
@@ -392,16 +431,18 @@
       type === "css"
         ? window.document.createElement("link")
         : window.document.createElement("script");
+    link.integrity = integrity;
+    link.crossOrigin = "anonymous";
     if (type === "css") {
       link.rel = "stylesheet";
       link.type = "text/css";
       link.href = url;
+      document.getElementsByTagName("HEAD")[0].appendChild(link);      
     } else if (type === "js") {
       link.type = "text/javascript";
       link.src = url;
+      document.body.appendChild(link);
     }
-    link.integrity = integrity;
-    link.crossOrigin = "anonymous";
-    document.getElementsByTagName("HEAD")[0].appendChild(link);
+    
   }
 })();
