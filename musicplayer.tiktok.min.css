@@ -28,7 +28,7 @@ body::-webkit-scrollbar {
   right: -370px;
   top: 60px;
   width: 370px;
-  z-index: 999;
+  z-index: 9999;
   transition: right 0.3s ease-in-out;
 }
 #btn-open {
