@@ -34,21 +34,91 @@
   initUI();
   importLink(
     "js",
-    `https://code.jquery.com/jquery-3.3.1.slim.min.js`,
-    `sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo`
-  );
-  importLink(
-    "js",
     `https://code.jquery.com/jquery-3.3.1.min.js`,
     `sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=`
   );
-  importLink(
-    "js",
-    `https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js`,
-    `sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM`
-  );  
-  importJs();
 
+  const frameUI = document.getElementById('tiktok-music-wrapper');
+  const btnUI = document.getElementById('btn-open');
+  const btnOpenConfig = document.getElementById('button-config');
+  const btnCloseConfig = document.getElementById('button-close');
+  const overlayClick = document.querySelector('.tiktok-music-overlay');
+  const apiConfig = JSON.parse(localStorage.getItem('apiConfig'));
+
+  function closeConfig() {
+    document.querySelector('#div-config').classList.remove('show');
+    document.querySelector('.tiktok-music-overlay').classList.remove('visibility');
+  };
+
+  btnUI.onclick = function () {
+    btnUI.classList.toggle('visibility');
+    frameUI.classList.toggle('visibility');
+    loadConfig();
+    if (!frameUI.classList.contains('visibility')) {
+      closeConfig();
+    }
+  }
+  btnOpenConfig.onclick = function () {
+    document.querySelector('#div-config').classList.toggle('show');
+    document.querySelector('.tiktok-music-overlay').classList.toggle('visibility');
+  };
+
+  btnCloseConfig.onclick = function () {
+    closeConfig();
+  }
+
+  overlayClick.onclick = function () {
+    closeConfig();
+  }
+
+  function loadConfig() {
+    document.querySelector('#api-host').value = apiConfig.host;
+    document.querySelector('#api-key').value = apiConfig.key;
+  }
+
+  function saveConfig() {
+    const apiHost = document.getElementById('api-host');
+    const apiKey = document.getElementById('api-key');
+    if (apiHost.value === '' || apiKey.value === '') {
+      alert('Value not empty');
+      apiHost.value === '' ? apiHost.focus() : apiKey.focus();
+    }
+    const apiInfor = {
+      host: apiHost.value,
+      key: apiKey.value
+    }
+    localStorage.setItem('apiConfig', JSON.stringify(apiInfor));
+    alert('Đã lưu! Nhấn OK để tải lại trang!');
+    location.reload();
+  }
+
+  const playPauseSong = document.getElementById('main-player');
+  playPauseSong.onclick = function () {
+    const thumbnail = document.querySelector('.play-song .thumbnail');
+    playPauseSong.classList.toggle('playing');
+    if (playPauseSong.classList.contains('playing')) {
+      thumbnail.style.animationPlayState = 'running';
+      playPauseSong.innerHTML = "<span><i class='fas fa-pause'></i></span>"
+    } else {
+      thumbnail.style.animationPlayState = 'paused';
+      playPauseSong.innerHTML = "<span><i class='fas fa-play'></i></span>"
+    }
+
+  };
+  const randomSong = document.getElementById('random-song')
+  randomSong.onclick = function () {
+    randomSong.getAttribute('data-control-random') === "disable" ? randomSong.setAttribute('data-control-random', 'enable') : randomSong.setAttribute('data-control-random', 'disable');
+  };
+
+  const repeatSong = document.getElementById('repeat-song')
+  repeatSong.onclick = function () {
+    repeatSong.getAttribute('data-control-repeat') === "disable" ? repeatSong.setAttribute('data-control-repeat', 'all') : repeatSong.getAttribute('data-control-repeat') === "all" ? repeatSong.setAttribute('data-control-repeat', 'again') : repeatSong.setAttribute('data-control-repeat', 'disable');
+    if (repeatSong.getAttribute('data-control-repeat') === "again") {
+      repeatSong.innerHTML = '<span><i class="fas fa-repeat-1"></i></span>';
+    } else {
+      repeatSong.innerHTML = '<span><i class="fas fa-repeat"></i></span>';
+    }
+  };
   function initUI() {
     const btnUI = `
     <div id="btn-open">
@@ -170,80 +240,9 @@
                     </div>
                 </div>
                 <div class="playlist">
-                    <div class="d-flex justify-content-center align-items-center p-3 mb-2">
-                      <button class="button bg-transparent border p-2 text-white" id="btn-get-song">Get List Song</button>
-                    </div>
+                    <a class="text-white cursor-pointer py-1 mb-2 d-block border-bottom border-white" id="get-list-song" href="#">Get List Song</a>
                     <ul class="music-list m-0 p-0">
-                        <li class="music-item">
-                            <div class="music-item-wrapper">
-                                <div class="music-avt rounded-circle">
-                                    <span class="avt-icon"><i class="fas fa-music"></i></span>
-                                </div>
-                                <div class="music-content">
-                                    <div class="song-info">
-                                        <span class="song-title">SONG-TITLE</span>
-                                        <span class="song-artist">Artist</span>
-                                        <span class="song-album">Album</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="music-item">
-                            <div class="music-item-wrapper">
-                                <div class="music-avt rounded-circle">
-                                    <span class="avt-icon"><i class="fas fa-music"></i></span>
-                                </div>
-                                <div class="music-content">
-                                    <div class="song-info">
-                                        <span class="song-title">SONG-TITLE</span>
-                                        <span class="song-artist">Artist</span>
-                                        <span class="song-album">Album</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="music-item">
-                            <div class="music-item-wrapper">
-                                <div class="music-avt rounded-circle">
-                                    <span class="avt-icon"><i class="fas fa-music"></i></span>
-                                </div>
-                                <div class="music-content">
-                                    <div class="song-info">
-                                        <span class="song-title">SONG-TITLE</span>
-                                        <span class="song-artist">Artist</span>
-                                        <span class="song-album">Album</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                      <li class="music-item">
-                            <div class="music-item-wrapper">
-                                <div class="music-avt rounded-circle">
-                                    <span class="avt-icon"><i class="fas fa-music"></i></span>
-                                </div>
-                                <div class="music-content">
-                                    <div class="song-info">
-                                        <span class="song-title">SONG-TITLE</span>
-                                        <span class="song-artist">Artist</span>
-                                        <span class="song-album">Album</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                      <li class="music-item">
-                            <div class="music-item-wrapper">
-                                <div class="music-avt rounded-circle">
-                                    <span class="avt-icon"><i class="fas fa-music"></i></span>
-                                </div>
-                                <div class="music-content">
-                                    <div class="song-info">
-                                        <span class="song-title">SONG-TITLE</span>
-                                        <span class="song-artist">Artist</span>
-                                        <span class="song-album">Album</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
+                                           
                     </ul>
                 </div>
             </div>
@@ -255,194 +254,132 @@
     console.log("inject");
   }
 
-  function getIdTikTok() {
-    const data = null;
+  function getUserId() {
     const username = window.location.href.split("@");
     const url =
-      "https://tiktok28.p.rapidapi.com/profile/" +
+      "https://tiktok28.p.rapidapi.com/profile/@" +
       username[1] +
       "?schemaType=1";
-    const xhr = new XMLHttpRequest();
-    xhr.withCredentials = true;
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "x-rapidapi-host": "tiktok28.p.rapidapi.com",
+        "x-rapidapi-key": apiConfig.key
+      },
+    })
+      .then((response) => { return response.json() })
+      .then((data) => {
+        // console.log(data.user.id);
+        getListSong(data.user.id);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
 
-    xhr.addEventListener("readystatechange", function () {
-      if (this.readyState === this.DONE) {
-        var resData = JSON.parse(this.responseText);
-        console.log(resData.user);
-        // console.log(resData)
+  function getListSong(user_id) {
+    const url = `https://tiktok-all-in-one.p.rapidapi.com/user/videos?id=${user_id}&max_cursor=1632138733000`;
+    fetch(url,
+      {
+        method: "GET",
+        headers: {
+          "x-rapidapi-host": apiConfig.host,
+          "x-rapidapi-key": apiConfig.key
+        }
       }
+    )
+      .then((response) => { return response.json() })
+      .then((data) => {
+        $('.music-list').empty();
+        $('.music-list').html(loadSongToHTML(data.aweme_list));
+        const listSong = document.querySelectorAll('.music-item');
+        listSong.forEach((item) => item.addEventListener('click', () => {
+          const el = document.querySelector('.music-item.playing');
+          if (el !== null) {
+            el.classList.remove('playing');
+            el.childNodes[0].removeChild(el.childNodes[0].lastElementChild);
+          }
+          item.classList.add('playing');
+          const childEle = document.createElement('div');
+          childEle.classList.add('action-play-gif');
+          childEle.innerHTML = '<i class="action-play-icon"></i>'
+          item.childNodes[0].appendChild(childEle);
+          // console.log(item, childEle);
+        }));
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  function loadSongToHTML(aweme_list) {
+    var list = '';
+    if (aweme_list === null) {
+      list += 'Not found music from this user '
+    }
+    aweme_list.forEach(item => {
+      list += `<li class="music-item" data-url-song="${item.music.play_url.uri}"><div class="music-item-wrapper"><div class="music-avt rounded-circle"><span class="avt-icon"><i class="fas fa-music"></i></span></div><div class="music-content"><div class="song-info"><span class="song-title">${item.music.title}</span><span class="song-artist">${item.music.author}</span><span class="song-album">${item.music.album}</span></div></div></div></li>`;
     });
-    xhr.open("GET", url);
-    xhr.setRequestHeader("x-rapidapi-host", "tiktok28.p.rapidapi.com");
-    xhr.setRequestHeader(
-      "x-rapidapi-key",
-      "6150648b36msh4af9f79046a129ap1bed93jsn0973858a8196"
-    );
-
-    xhr.send(data);
-
-    // fetch("https://tiktok28.p.rapidapi.com/profile/@valentinaof.4?schemaType=1", {
-    // 	"method": "GET",
-    // 	"headers": {
-    // 		"x-rapidapi-host": "tiktok28.p.rapidapi.com",
-    // 		"x-rapidapi-key": "6150648b36msh4af9f79046a129ap1bed93jsn0973858a8196"
-    // 	}
-    // })
-    // .then(response => {
-    // 	console.log(response.json());
-    // })
-    // .catch(err => {
-    // 	console.error(err);
-    // });
+    return list;
   }
 
-  function importJs() {
-    const inject = `
-    const frameUI = document.getElementById('tiktok-music-wrapper');
-    const btnUI = document.getElementById('btn-open');
-    const btnOpenConfig = document.getElementById('button-config');
-    const btnCloseConfig = document.getElementById('button-close');
-    const overlayClick = document.querySelector('.tiktok-music-overlay');
+  $('#get-list-song').click(function () {
+    getUserId();
+  });
+})();
+
+
+function importJs() {
+  const inject = `
     
-    function closeConfig (){
-        document.querySelector('#div-config').classList.remove('show');
-        document.querySelector('.tiktok-music-overlay').classList.remove('visibility');
-    };
-    
-    btnUI.onclick = function(){
-      btnUI.classList.toggle('visibility');
-      frameUI.classList.toggle('visibility');
-      loadConfig();
-      if(!frameUI.classList.contains('visibility')){
-            closeConfig();      
-      }
-    }
-    
-    btnOpenConfig.onclick = function (){
-      document.querySelector('#div-config').classList.toggle('show');
-      document.querySelector('.tiktok-music-overlay').classList.toggle('visibility');
-    };
-    
-    btnCloseConfig.onclick = function(){
-      closeConfig();
-    }
-    
-    overlayClick.onclick = function(){
-      closeConfig();
-    }
-    
-    function loadConfig(){
-      const api = JSON.parse(localStorage.getItem('apiConfig'));
-      document.querySelector('#api-host').value = api.host;
-      document.querySelector('#api-key').value = api.key;
-    }
-    
-    function saveConfig(){
-      const apiHost = document.getElementById('api-host');
-      const apiKey = document.getElementById('api-key');
-      if(apiHost.value === '' || apiKey.value === ''){
-        alert('Value not empty');
-        apiHost.value === '' ? apiHost.focus() : apiKey.focus();
-      }
-      const apiInfor = {
-        host: apiHost.value,
-        key: apiKey.value
-      }
-      localStorage.setItem('apiConfig', JSON.stringify(apiInfor));
-      alert('Đã lưu! Nhấn OK để tải lại trang!');
-      location.reload();
-    }
-    
-    const listSong = document.querySelectorAll('.music-item');
-    listSong.forEach(item => item.addEventListener('click', () => {
-      const el = document.querySelector('.music-item.playing');
-      if(el !== null) {
-        el.classList.remove('playing');
-        el.childNodes[1].removeChild(el.childNodes[1].lastElementChild);
-      }
-      item.classList.add('playing');  
-      const childEle = document.createElement('div');
-      childEle.classList.add('action-play-gif');
-      childEle.innerHTML = '<i class="action-play-icon"></i>'
-      item.childNodes[1].appendChild(childEle);
-    }));
-    
-    const playPauseSong = document.getElementById('main-player');
-    playPauseSong.onclick = function(){
-      const thumbnail = document.querySelector('.play-song .thumbnail');
-      playPauseSong.classList.toggle('playing');
-      if(playPauseSong.classList.contains('playing')){
-        thumbnail.style.animationPlayState = 'running';
-        playPauseSong.innerHTML = "<span><i class='fas fa-pause'></i></span>"
-      }else{
-        thumbnail.style.animationPlayState = 'paused';
-        playPauseSong.innerHTML = "<span><i class='fas fa-play'></i></span>"
-      } 
-      
-    };
-    const randomSong = document.getElementById('random-song')
-    randomSong.onclick = function(){
-      randomSong.getAttribute('data-control-random') === "disable" ? randomSong.setAttribute('data-control-random','enable') : randomSong.setAttribute('data-control-random','disable');
-    };
-    
-    const repeatSong = document.getElementById('repeat-song')
-    repeatSong.onclick = function(){
-      repeatSong.getAttribute('data-control-repeat') === "disable" ? repeatSong.setAttribute('data-control-repeat','all') : repeatSong.getAttribute('data-control-repeat') === "all" ? repeatSong.setAttribute('data-control-repeat','again') : repeatSong.setAttribute('data-control-repeat','disable');
-      if(repeatSong.getAttribute('data-control-repeat') === "again"){
-        repeatSong.innerHTML = '<span><i class="fas fa-repeat-1"></i></span>';
-      }else{
-        repeatSong.innerHTML = '<span><i class="fas fa-repeat"></i></span>';
-      }
-    };
     `;
-    var script = window.document.createElement("script");
-    script.type = "text/javascript";
-    script.innerHTML = inject;
-    document.getElementsByTagName("HEAD")[0].appendChild(script);
-  }
+  var script = window.document.createElement("script");
+  script.type = "text/javascript";
+  script.innerHTML = inject;
+  document.getElementsByTagName("HEAD")[0].appendChild(script);
+}
 
-  function loadCSS(url) {
-    /*var meta = window.document.createElement("meta");
-    meta.setAttribute("http-equiv", "Access-Control-Allow-Origin");
-    meta.setAttribute("content", "*");
-    document.getElementsByTagName("HEAD")[0].appendChild(meta);*/
+function loadCSS(url) {
+  /*var meta = window.document.createElement("meta");
+  meta.setAttribute("http-equiv", "Access-Control-Allow-Origin");
+  meta.setAttribute("content", "*");
+  document.getElementsByTagName("HEAD")[0].appendChild(meta);*/
 
-    var link = window.document.createElement("link");
+  var link = window.document.createElement("link");
+  link.rel = "stylesheet";
+  link.type = "text/css";
+  link.href = url;
+  document.getElementsByTagName("HEAD")[0].appendChild(link);
+}
+
+function importStyleCss(url) {
+  var style = window.document.createElement("style");
+  style.type = "text/css";
+  $.get(
+    url,
+    function (data) {
+      style.innerHTML = data;
+    },
+    "text"
+  );
+  document.getElementsByTagName("HEAD")[0].appendChild(style);
+}
+
+function importLink(type, url, integrity) {
+  const link =
+    type === "css"
+      ? window.document.createElement("link")
+      : window.document.createElement("script");
+  link.integrity = integrity;
+  link.crossOrigin = "anonymous";
+  if (type === "css") {
     link.rel = "stylesheet";
     link.type = "text/css";
     link.href = url;
     document.getElementsByTagName("HEAD")[0].appendChild(link);
+  } else if (type === "js") {
+    link.type = "text/javascript";
+    link.src = url;
+    document.body.appendChild(link);
   }
-
-  function importStyleCss(url) {
-    var style = window.document.createElement("style");
-    style.type = "text/css";
-    $.get(
-      url,
-      function (data) {
-        style.innerHTML = data;
-      },
-      "text"
-    );
-    document.getElementsByTagName("HEAD")[0].appendChild(style);
-  }
-  function importLink(type, url, integrity) {
-    const link =
-      type === "css"
-        ? window.document.createElement("link")
-        : window.document.createElement("script");
-    link.integrity = integrity;
-    link.crossOrigin = "anonymous";
-    if (type === "css") {
-      link.rel = "stylesheet";
-      link.type = "text/css";
-      link.href = url;
-      document.getElementsByTagName("HEAD")[0].appendChild(link);      
-    } else if (type === "js") {
-      link.type = "text/javascript";
-      link.src = url;
-      document.body.appendChild(link);
-    }
-    
-  }
-})();
+}

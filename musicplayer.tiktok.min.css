@@ -222,9 +222,12 @@ body::-webkit-scrollbar {
 .play-song .player-controls > #main-player span {
   font-size: 1.7rem;
 }
-.playlist {
+.music-list {
   max-height: 356px;
   overflow: auto;
+}
+.music-list::-webkit-scrollbar{
+  display: none;
 }
 .playlist::-webkit-scrollbar {
   width: 4px;
