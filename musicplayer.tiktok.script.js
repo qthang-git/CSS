@@ -31,6 +31,7 @@
   importStyleCss(
     `https://raw.githubusercontent.com/qthang-git/userscripts/main/musicplayer.tiktok.min.css`
   );
+  
   initUI();
   importLink(
     "js",
@@ -44,33 +45,15 @@
   const btnCloseConfig = document.getElementById('button-close');
   const overlayClick = document.querySelector('.tiktok-music-overlay');
   const apiConfig = JSON.parse(localStorage.getItem('apiConfig'));
+  const audio = document.getElementById('audio');
+  const ul_list = document.querySelector('.music-list');
+  const thumbnail = document.querySelector('.play-song .thumbnail');
 
   function closeConfig() {
     document.querySelector('#div-config').classList.remove('show');
     document.querySelector('.tiktok-music-overlay').classList.remove('visibility');
   };
-
-  btnUI.onclick = function () {
-    btnUI.classList.toggle('visibility');
-    frameUI.classList.toggle('visibility');
-    loadConfig();
-    if (!frameUI.classList.contains('visibility')) {
-      closeConfig();
-    }
-  }
-  btnOpenConfig.onclick = function () {
-    document.querySelector('#div-config').classList.toggle('show');
-    document.querySelector('.tiktok-music-overlay').classList.toggle('visibility');
-  };
-
-  btnCloseConfig.onclick = function () {
-    closeConfig();
-  }
-
-  overlayClick.onclick = function () {
-    closeConfig();
-  }
-
+  
   function loadConfig() {
     document.querySelector('#api-host').value = apiConfig.host;
     document.querySelector('#api-key').value = apiConfig.key;
@@ -91,26 +74,51 @@
     alert('Đã lưu! Nhấn OK để tải lại trang!');
     location.reload();
   }
+  btnUI.onclick = function () {
+    btnUI.classList.toggle('visibility');
+    frameUI.classList.toggle('visibility');
+    loadConfig();
+    if (!frameUI.classList.contains('visibility')) {
+      closeConfig();
+    }
+  }
+  
+  btnOpenConfig.onclick = function () {
+    document.querySelector('#div-config').classList.toggle('show');
+    document.querySelector('.tiktok-music-overlay').classList.toggle('visibility');
+  };
 
-  const playPauseSong = document.getElementById('main-player');
+  btnCloseConfig.onclick = function () {
+    closeConfig();
+  }
+
+  overlayClick.onclick = function () {
+    closeConfig();
+  }
+
+  
+
+  const playPauseSong = document.getElementById('play-song');
   playPauseSong.onclick = function () {
-    const thumbnail = document.querySelector('.play-song .thumbnail');
+    const playing = document.querySelector('.music-item.playing .action-play-gif');
     playPauseSong.classList.toggle('playing');
     if (playPauseSong.classList.contains('playing')) {
       thumbnail.style.animationPlayState = 'running';
-      playPauseSong.innerHTML = "<span><i class='fas fa-pause'></i></span>"
+      playing.style.display = "block";
+      audio.play();
     } else {
       thumbnail.style.animationPlayState = 'paused';
-      playPauseSong.innerHTML = "<span><i class='fas fa-play'></i></span>"
+      playing.style.display = "none";
+      audio.pause();
     }
-
   };
-  const randomSong = document.getElementById('random-song')
+  
+  const randomSong = document.getElementById('random-song');
   randomSong.onclick = function () {
     randomSong.getAttribute('data-control-random') === "disable" ? randomSong.setAttribute('data-control-random', 'enable') : randomSong.setAttribute('data-control-random', 'disable');
   };
 
-  const repeatSong = document.getElementById('repeat-song')
+  const repeatSong = document.getElementById('repeat-song');
   repeatSong.onclick = function () {
     repeatSong.getAttribute('data-control-repeat') === "disable" ? repeatSong.setAttribute('data-control-repeat', 'all') : repeatSong.getAttribute('data-control-repeat') === "all" ? repeatSong.setAttribute('data-control-repeat', 'again') : repeatSong.setAttribute('data-control-repeat', 'disable');
     if (repeatSong.getAttribute('data-control-repeat') === "again") {
@@ -119,6 +127,56 @@
       repeatSong.innerHTML = '<span><i class="fas fa-repeat"></i></span>';
     }
   };
+  
+  const nextSong = document.getElementById('next-song');
+  nextSong.onclick = function () {
+    var playingCurrent = document.querySelector('.music-item.playing');
+    var playingNext = document.querySelector('.music-item.playing + .music-item') || document.querySelector('.music-item:first-child');;
+    
+    playingNext.classList.add('playing');
+    playingCurrent.classList.remove('playing');
+    
+    var activeSource = document.querySelector('#audio source.active');
+    var nextSource = document.querySelector('#audio source.active + source') || document.querySelector('#audio source:first-child');
+    // deactivate current source, and activate the next one
+    activeSource.className = '';
+    nextSource.className = 'active';
+    // update the audio source and start playback
+    audio.src = nextSource.src;
+    audio.play();
+  };
+  
+  const prevSong = document.getElementById('previous-song');
+  prevSong.onclick = function () {
+    var playingCurrent = document.querySelector('.music-item.playing');
+    var playingPrev = playingCurrent.previousElementSibling || document.querySelector('.music-item:last-child');;
+    
+    playingPrev.classList.add('playing');
+    playingCurrent.classList.remove('playing');
+    
+    var activeSource = document.querySelector('#audio source.active');
+    var prevSource = activeSource.previousElementSibling || document.querySelector('#audio source:last-child');
+    // deactivate current source, and activate the prev one
+    activeSource.className = '';
+    prevSource.className = 'active';
+    // update the audio source and start playback
+    audio.src = prevSource.src;
+    audio.play();
+  };
+  
+  audio.addEventListener('ended', function(e){
+    var activeSource = document.querySelector('#audio source.active');
+    var nextSource = document.querySelector('#audio source.active + source') || document.querySelector('#audio source:first-child');
+    // deactivate current source, and activate the next one
+    activeSource.className = '';
+    nextSource.className = 'active';
+    // update the audio source and start playback
+    audio.src = nextSource.src;
+    audio.play();
+  });
+  
+  
+  
   function initUI() {
     const btnUI = `
     <div id="btn-open">
@@ -185,7 +243,7 @@
                 </div>
             </div>
         </div>
-        <div class="player-body">
+        <div class="player-body pb-1">
             <div class="container">
                 <div >
 
@@ -214,6 +272,7 @@
                     </div>
                     <div class="controls-main">
                         <div class="player-controls">
+                            <audio id="audio" preload="none"></audio>
                             <div class="controls-advenced" id="random-song" data-control-random="disable">
                                 <span><i class="fas fa-random"></i></span>
                             </div>
@@ -223,8 +282,8 @@
                             <div class="controls-default" id="fast-backward-song">
                                 <span><i class="fas fa-fast-backward"></i></span>
                             </div>
-                            <div class="controls-default" id="main-player">
-                                <span><i class="fas fa-play"></i></span>
+                            <div class="controls-default" id="play-song">
+                                <span><i class="fas fa-play"></i><i class='fas fa-pause'></i></span>
                             </div>
                             <div class="controls-default" id="fast-forward-song">
                                 <span><i class="fas fa-fast-forward"></i></span>
@@ -290,22 +349,28 @@
     )
       .then((response) => { return response.json() })
       .then((data) => {
-        $('.music-list').empty();
-        $('.music-list').html(loadSongToHTML(data.aweme_list));
+        ul_list.innerHTML = " ";
+        audio.innerHTML = " ";
+        audio.src = " ";
+        loadSongToHTML(data.aweme_list);
         const listSong = document.querySelectorAll('.music-item');
-        listSong.forEach((item) => item.addEventListener('click', () => {
-          const el = document.querySelector('.music-item.playing');
-          if (el !== null) {
-            el.classList.remove('playing');
-            el.childNodes[0].removeChild(el.childNodes[0].lastElementChild);
-          }
-          item.classList.add('playing');
-          const childEle = document.createElement('div');
-          childEle.classList.add('action-play-gif');
-          childEle.innerHTML = '<i class="action-play-icon"></i>'
-          item.childNodes[0].appendChild(childEle);
-          // console.log(item, childEle);
-        }));
+        listSong.forEach((item, index) => {
+          item.addEventListener('click', () => {
+            const el = document.querySelector('.music-item.playing');
+            const source = document.querySelector('#audio #song-'+index);
+            const sourceActive = document.querySelector('#audio source.active');
+            if (el !== null && sourceActive !== null ) {
+              el.classList.remove('playing');
+              sourceActive.classList.remove('active');
+            }
+            item.classList.add('playing');
+            source.classList.add('active');
+            playPauseSong.classList.add('playing');
+            thumbnail.style.animationPlayState = 'running';
+            audio.src = item.getAttribute('data-source-mp3');
+            audio.play();            
+          })
+        });
       })
       .catch((err) => {
         console.error(err);
@@ -314,25 +379,32 @@
 
   function loadSongToHTML(aweme_list) {
     var list = '';
-    if (aweme_list === null) {
-      list += 'Not found music from this user '
-    }
-    aweme_list.forEach(item => {
-      list += `<li class="music-item" data-url-song="${item.music.play_url.uri}"><div class="music-item-wrapper"><div class="music-avt rounded-circle"><span class="avt-icon"><i class="fas fa-music"></i></span></div><div class="music-content"><div class="song-info"><span class="song-title">${item.music.title}</span><span class="song-artist">${item.music.author}</span><span class="song-album">${item.music.album}</span></div></div></div></li>`;
-    });
-    return list;
+    var sourceAudio = '';
+    if (aweme_list !== null) {
+      aweme_list.forEach((item, index) => {
+        var url = item.music.play_url.uri;
+        if(url !== ''){
+          sourceAudio += `<source id="song-${index}" src="${url}" type="audio/mpeg"></source>`;       
+          list += `<li class="music-item song-${index}" data-source-mp3="${url}"><div class="music-item-wrapper"><div class="music-avt rounded-circle"><span class="avt-icon"><i class="fas fa-music"></i></span></div><div class="music-content"><div class="song-info"><span class="song-title">${item.music.title}</span><span class="song-artist">Artist: ${item.music.author !== '' ? item.music.author : 'empty' }</span><span class="song-album">Album: ${item.music.album !== '' ? item.music.album : 'empty' }</span></div></div><div class="action-play-gif"><i class="action-play-icon"></i></div></div></li>`;
+        }
+      });
+    }else{
+      list =  `Can't find song from this account`;
+      alert(list);
+    }    
+    audio.innerHTML = sourceAudio;
+    ul_list.innerHTML = list;
   }
 
   $('#get-list-song').click(function () {
     getUserId();
   });
+  
+  
+
 })();
 
-
-function importJs() {
-  const inject = `
-    
-    `;
+function importScriptContents(inject) {
   var script = window.document.createElement("script");
   script.type = "text/javascript";
   script.innerHTML = inject;
