@@ -44,6 +44,7 @@ body::-webkit-scrollbar {
   background-color: #000;
   opacity: 0.7;
   transition: right 0.3s ease-in-out;
+  cursor: pointer;
 }
 #tiktok-music-wrapper.visibility{
   right: 0;
