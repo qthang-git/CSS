@@ -267,6 +267,12 @@ body::-webkit-scrollbar {
 .music-item:hover {
   opacity: 0.55;
 }
+.music-item .action-play-gif{
+  display: none;
+}
+.music-item.playing .action-play-gif{
+  display: block;
+}
 .music-item.playing:focus,
 .music-item.playing:hover {
   opacity: 1;
