@@ -218,8 +218,18 @@ body::-webkit-scrollbar {
   justify-content: center;
   width: var(--size-play-pause);
 }
-.play-song .player-controls > #main-player span {
+.play-song .player-controls > #play-song span {
   font-size: 1.7rem;
+}
+.play-song .player-controls > #play-song .fa{
+  transition: opacity 0.3s linear 2s;
+}
+.play-song .player-controls > #play-song.playing fa-play,
+.play-song .player-controls > #play-song fa-pause{
+  opacity: 0;
+}
+.play-song .player-controls > #play-song.playing fa-pause{
+  opacity: 1;
 }
 .music-list {
   max-height: 356px;
