@@ -221,14 +221,14 @@ body::-webkit-scrollbar {
 .play-song .player-controls > #play-song span {
   font-size: 1.7rem;
 }
-.play-song .player-controls > #play-song .fa{
+.play-song .player-controls > #play-song .fas{
   transition: opacity 0.3s linear 2s;
 }
-.play-song .player-controls > #play-song.playing fa-play,
-.play-song .player-controls > #play-song fa-pause{
+.play-song .player-controls > #play-song.playing .fa-play,
+.play-song .player-controls > #play-song .fa-pause{
   opacity: 0;
 }
-.play-song .player-controls > #play-song.playing fa-pause{
+.play-song .player-controls > #play-song.playing .fa-pause{
   opacity: 1;
 }
 .music-list {
