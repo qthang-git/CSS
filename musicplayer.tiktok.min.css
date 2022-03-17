@@ -226,10 +226,10 @@ body::-webkit-scrollbar {
 }
 .play-song .player-controls > #play-song.playing .fa-play,
 .play-song .player-controls > #play-song .fa-pause{
-  opacity: 0;
+  display: none;
 }
 .play-song .player-controls > #play-song.playing .fa-pause{
-  opacity: 1;
+  display: block;
 }
 .music-list {
   max-height: 356px;
