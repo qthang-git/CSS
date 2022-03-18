@@ -27,7 +27,7 @@ body::-webkit-scrollbar {
   right: -370px;
   top: 60px;
   width: 370px;
-  z-index: 9999;
+  z-index: 1000;
   transition: right 0.3s ease-in-out;
 }
 #btn-open {
@@ -90,7 +90,7 @@ body::-webkit-scrollbar {
   -o-transition: left 0.35s ease;
   -moz-transition: left 0.35s ease;
   transition: left 0.35s ease;
-  z-index: 9999;
+  z-index: 1100;
 }
 .tiktok-music-overlay.visibility{
   display: block;
@@ -125,7 +125,7 @@ body::-webkit-scrollbar {
   -moz-transition: left 0.35s ease-in;
   transition: left 0.35s ease-in;
   width: 100%;
-  z-index: 100;
+  z-index: 1100;
 }
 #div-config.show {
   left: 0;
