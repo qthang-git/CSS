@@ -190,6 +190,9 @@ body::-webkit-scrollbar {
   height: var(--size-action-play);
   width: var(--size-action-play);
 }
+.play-song.hidden-before::before{
+  display: none;
+}
 .play-song::before{
     content: '';
     width: 200px;
