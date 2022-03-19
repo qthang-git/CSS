@@ -215,10 +215,10 @@ body::-webkit-scrollbar {
   font-size: 1rem;
 }
 .play-song .player-controls > #play-song {
-  align-items: center;
   display: flex;
-  height: var(--size-play-pause);
   justify-content: center;
+  align-items: center;
+  height: var(--size-play-pause);
   width: var(--size-play-pause);
 }
 .play-song .player-controls > #play-song span {
@@ -226,13 +226,6 @@ body::-webkit-scrollbar {
 }
 .play-song .player-controls > #play-song .fas{
   transition: opacity 0.3s linear 2s;
-}
-.play-song .player-controls > #play-song.playing .fa-play,
-.play-song .player-controls > #play-song .fa-pause{
-  display: none;
-}
-.play-song .player-controls > #play-song.playing .fa-pause{
-  display: block;
 }
 .music-list {
   max-height: 356px;
