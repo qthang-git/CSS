@@ -31,14 +31,14 @@ body::-webkit-scrollbar {
   transition: right 0.3s ease-in-out;
 }
 #btn-open {
-  width: 35px;
-  height: 35px;
+  width: 30px;
+  height: 30px;
   justify-content: center;
   position: absolute;
-  left: -35px;
+  left: -30px;
   top: 0;
   background-image: url("data:image/svg+xml;base64,PHN2ZwogICAgICAgIHdpZHRoPSIyOCIKICAgICAgICBoZWlnaHQ9IjMyIgogICAgICAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgICAgICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICAgICA+CiAgICAgICAgPGcKICAgICAgICAgIGNsYXNzPSJsYXllciIKICAgICAgICAgIGZpbGw9IndoaXRlIgogICAgICAgICAgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1maWxsPSIiCiAgICAgICAgICBzdHlsZT0iLS1kYXJrcmVhZGVyLWlubGluZS1maWxsOiNlOGU2ZTM7IgogICAgICAgID4KICAgICAgICAgIDx0aXRsZT5MYXllciAxPC90aXRsZT4KICAgICAgICAgIDxwYXRoCiAgICAgICAgICAgIGQ9Im0yOC4wNjI1MDksMTMuMDk1MTM5YTEzLjEwMDksMTMuMTA0NDk3IDAgMCAxIC03LjY1Njg0OCwtMi40NDg1OTNsMCwxMS4xNDkzNjVhMTAuMTM3ODI0LDEwLjE0MDYwNyAwIDEgMSAtOC43NDU3ODMsLTEwLjA0ODI3OGwwLDUuNjA3NzQ3YTQuNjUzODU3LDQuNjU1MTM1IDAgMSAwIDMuMjU3NDUsNC40NDA1MzJsMCwtMjEuNzk1OTExbDUuNDg4MzMzLDBhNy41NTc2ODQsNy41NTk3NTkgMCAwIDAgMC4xMTYwMDMsMS4zODMwNjVsMCwwYTcuNjIwMDUxLDcuNjIyMTQzIDAgMCAwIDMuMzYyMjI4LDUuMDA0NDg4YTcuNTczMjc2LDcuNTc1MzU1IDAgMCAwIDQuMTc4NjE3LDEuMjU2NDI1bDAsNS40NTExNjFsMCwtMC4wMDAwMDF6IgogICAgICAgICAgICBpZD0ic3ZnXzEiCiAgICAgICAgICA+PC9wYXRoPgogICAgICAgIDwvZz4KICAgICAgPC9zdmc+");
-  background-size: 28px 32px;
+  background-size: 22px 22px;
   background-repeat: no-repeat;
   background-position: center;
   background-color: #000;
