@@ -171,7 +171,7 @@ body::-webkit-scrollbar {
   display: flex;
   flex-wrap: wrap;
   gap: 0 20px;
-  margin: 10px 0;
+  margin: 5px 0;
   position: relative;
 }
 .play-song .thumbnail {
@@ -254,6 +254,7 @@ body::-webkit-scrollbar {
   font-size: 12px;
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
 }
 .play-song .player-timeline .timeline-bar{
