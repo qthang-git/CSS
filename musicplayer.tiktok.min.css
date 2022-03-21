@@ -262,16 +262,15 @@ body::-webkit-scrollbar {
 .music-item {
   border-bottom: 1px solid;
   cursor: pointer;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
+  padding: 15px 0;
 }
 .music-item.playing,
 .music-item.playing:focus,
 .music-item.playing:hover {
   cursor: default;
 }
-.music-item:last-child {
-  border-bottom: 0;
+.music-item:first-child {
+  border-top: 1px solid;
 }
 .music-item:focus,
 .music-item:hover {
