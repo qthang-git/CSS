@@ -251,7 +251,10 @@ body::-webkit-scrollbar {
   transition: opacity 0.3s linear 2s;
 }
 .play-song .player-timeline {
-  font-size: 14px
+  font-size: 12px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 .play-song .player-timeline .timeline-bar{
   width: 100%;
