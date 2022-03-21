@@ -269,9 +269,6 @@ body::-webkit-scrollbar {
 .music-item.playing:hover {
   cursor: default;
 }
-.music-item:first-child {
-  border-top: 1px solid;
-}
 .music-item:focus,
 .music-item:hover {
   opacity: 0.55;
