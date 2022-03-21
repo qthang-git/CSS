@@ -21,21 +21,22 @@ body::-webkit-scrollbar {
   font-family: Chakra Petch, sans-serif;
   font-size: 16px;
   font-weight: 400;
+  display: flex;
+  align-items: flex-start;
   height: auto;
   position: fixed;
   right: -370px;
   top: 60px;
-  width: 370px;
+  width: 400px;
+  overflow: hidden;
   z-index: 1000;
   transition: right 0.3s ease-in-out;
 }
 #btn-open {
   width: 30px;
   height: 30px;
+  flex: 0 0 30px;
   justify-content: center;
-  position: absolute;
-  left: -30px;
-  top: 0;
   background-image: url("data:image/svg+xml;base64,PHN2ZwogICAgICAgIHdpZHRoPSIyOCIKICAgICAgICBoZWlnaHQ9IjMyIgogICAgICAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgICAgICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICAgICA+CiAgICAgICAgPGcKICAgICAgICAgIGNsYXNzPSJsYXllciIKICAgICAgICAgIGZpbGw9IndoaXRlIgogICAgICAgICAgZGF0YS1kYXJrcmVhZGVyLWlubGluZS1maWxsPSIiCiAgICAgICAgICBzdHlsZT0iLS1kYXJrcmVhZGVyLWlubGluZS1maWxsOiNlOGU2ZTM7IgogICAgICAgID4KICAgICAgICAgIDx0aXRsZT5MYXllciAxPC90aXRsZT4KICAgICAgICAgIDxwYXRoCiAgICAgICAgICAgIGQ9Im0yOC4wNjI1MDksMTMuMDk1MTM5YTEzLjEwMDksMTMuMTA0NDk3IDAgMCAxIC03LjY1Njg0OCwtMi40NDg1OTNsMCwxMS4xNDkzNjVhMTAuMTM3ODI0LDEwLjE0MDYwNyAwIDEgMSAtOC43NDU3ODMsLTEwLjA0ODI3OGwwLDUuNjA3NzQ3YTQuNjUzODU3LDQuNjU1MTM1IDAgMSAwIDMuMjU3NDUsNC40NDA1MzJsMCwtMjEuNzk1OTExbDUuNDg4MzMzLDBhNy41NTc2ODQsNy41NTk3NTkgMCAwIDAgMC4xMTYwMDMsMS4zODMwNjVsMCwwYTcuNjIwMDUxLDcuNjIyMTQzIDAgMCAwIDMuMzYyMjI4LDUuMDA0NDg4YTcuNTczMjc2LDcuNTc1MzU1IDAgMCAwIDQuMTc4NjE3LDEuMjU2NDI1bDAsNS40NTExNjFsMCwtMC4wMDAwMDF6IgogICAgICAgICAgICBpZD0ic3ZnXzEiCiAgICAgICAgICA+PC9wYXRoPgogICAgICAgIDwvZz4KICAgICAgPC9zdmc+");
   background-size: 22px 22px;
   background-repeat: no-repeat;
@@ -48,7 +49,7 @@ body::-webkit-scrollbar {
 #tiktok-music-wrapper.visibility{
   right: 0;
 }
-#tiktok-music-wrapper.visibility::before{
+.wrapper-player::before{
   content: '';
   position: absolute;
   width: 100%;
