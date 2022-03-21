@@ -168,10 +168,11 @@ body::-webkit-scrollbar {
 
 .play-song {
   align-items: center;
-  border-bottom: 1px solid;
   display: flex;
+  flex-wrap: wrap;
   gap: 0 20px;
   padding: 10px 0;
+  position: relative;
 }
 .play-song .thumbnail {
   align-items: center;
@@ -248,6 +249,16 @@ body::-webkit-scrollbar {
 }
 .play-song .player-controls > #play-song .fas{
   transition: opacity 0.3s linear 2s;
+}
+.play-song .player-timeline {
+  font-size: 14px
+}
+.play-song .player-timeline .timeline-bar{
+  width: 100%;
+  height: 4px;
+  border-radius: 5px;
+  border: 1px solid #eb0909;
+  background: #eb0909;
 }
 .music-list {
   max-height: 356px;
