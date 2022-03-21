@@ -17,7 +17,6 @@ body::-webkit-scrollbar {
   display: none;
 }
 #tiktok-music-wrapper {
-  background-image: linear-gradient(180deg, #d564ed, #1ec7d1, #37c8ff);
   color: #fff;
   font-family: Chakra Petch, sans-serif;
   font-size: 16px;
@@ -48,6 +47,14 @@ body::-webkit-scrollbar {
 }
 #tiktok-music-wrapper.visibility{
   right: 0;
+}
+#tiktok-music-wrapper.visibility::before{
+  content: '';
+  position: absolute;
+  width: 100%;
+  min-height: 522.8px;  
+  background-image: linear-gradient(180deg, #d564ed, #1ec7d1, #37c8ff);
+  z-index: -1;
 }
 #btn-open.visibility{
   background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMjQgMjAuMTg4bC04LjMxNS04LjIwOSA4LjItOC4yODItMy42OTctMy42OTctOC4yMTIgOC4zMTgtOC4zMS04LjIwMy0zLjY2NiAzLjY2NiA4LjMyMSA4LjI0LTguMjA2IDguMzEzIDMuNjY2IDMuNjY2IDguMjM3LTguMzE4IDguMjg1IDguMjAzeiIvPjwvc3ZnPg==");
