@@ -1,23 +1,21 @@
 // ==UserScript==
-// @name         Music Player
-// @namespace
-// @version
-// @description
-// @author       You
+// @name         Music Player TikTok
+// @namespace    github.com.music.player.tiktok
+// @version      1.0.3
+// @description  Get songs from account tiktok for MediaPlayer 
+// @author       qthang
 // @match        https://www.tiktok.com/*
 // @grant        GM_xmlhttpRequest
 // @require http://code.jquery.com/jquery-3.3.1.min.js
-// @require https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.4/js/uikit.min.js
-// @require https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.4/js/components/notification.min.js
-// @require https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.4/js/uikit-icons.min.js
+// @require https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js
+// @require https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js
 // @license MIT
 // ==/UserScript==
+/*<script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
+<script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>*/
 (function () {
   "use strict";
   const body = "body";
-  // importStyleCss(
-  //   `https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css`
-  // );
   importLink(
     "css",
     `https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css`,
@@ -37,88 +35,291 @@
     `https://code.jquery.com/jquery-3.3.1.min.js`,
     `sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=`
   );
-
-  const frameUI = document.getElementById('tiktok-music-wrapper');
+  importLink(
+    `js`,
+    `https://unpkg.com/@popperjs/core@2.11.4/dist/umd/popper.min.js`,
+    `sha384-IQsByMjnJ4oUdZoDmVz0Ux9lwH+pFRte3CHB6GO8oW5ZhyRK4wd8eBNa8F58bQh1`
+  );
+  importLink(
+    `js`,
+    `https://unpkg.com/tippy.js@6.3.7/dist/tippy-bundle.umd.min.js`,
+    `sha384-AiTRpehQ7zqeua0Ypfa6Q4ki/ddhczZxrKtiQbTQUlJIhBkTeyoZP9/W/5ulFt29`
+  );
+  const apiConfig = {
+    host: `tiktok-all-in-one.p.rapidapi.com`,
+    key: `6150648b36msh4af9f79046a129ap1bed93jsn0973858a8196`
+  }
+  
+  var listSong = [];
+  var isPlay = false;
+  var isRandom = false;
+  var isRepeat1 = false;
+  var isRepeatAll = false;
+  var isFirst = true;
+  var indexCurrent = 0;
+  var audio = document.getElementById('audio');
+  var durationTime = document.querySelector('.end-time');
+  var remainingTime = document.querySelector('.start-time');
+  
+  
+  function removeAnimation(){
+    const el = document.querySelector('.music-item.playing');
+    if(el != null){
+      document.querySelector('.play-song .thumbnail').style.animationPlayState = 'paused';
+      el.classList.remove('playing');
+    }
+  }
+  
+  function addAnimation(){
+    removeAnimation();
+    const li = document.querySelectorAll('.music-item');
+    li[indexCurrent].classList.add('playing');
+    document.querySelector('.play-song .thumbnail').style.animationPlayState = 'running';    
+    const li_playing = isRepeatAll === false ? (document.querySelector('.music-item.playing')) : (document.querySelector('.music-item.playing') || document.querySelector('.music-item:first-child'));
+    li_playing.scrollIntoView(true);
+  }
+  
+  function getTitleSong(){
+      document.querySelector('.title-song').innerHTML = `<span>Name: ${listSong[indexCurrent].music.title}</span>`;
+  }
+  
+  function formatTime(time){
+    var minutes = Math.floor(time / 60);
+    var seconds = Math.floor(time - (minutes * 60));
+    if(minutes < 10) {minutes = '0'.concat(minutes.toString())};
+    if(seconds < 10) {seconds = '0'.concat(seconds.toString())};
+    return `${minutes}:${seconds}`;
+  }
+  const rangeBar = document.querySelector('.timeline-bar');
+  function handleChange(){
+     audio.currentTime = rangeBar.value;
+  }
+  rangeBar.addEventListener('change', handleChange);
+  
+  function displayTimer(){
+    const {duration, currentTime} = audio;
+    rangeBar.max = duration;
+    rangeBar.value = currentTime;
+    remainingTime.textContent = formatTime(currentTime);
+    if(!duration){
+      durationTime.textContent = '00:00';
+    }else{
+      durationTime.textContent = formatTime(duration);
+    }
+  }
+  
+  displayTimer();
+  setInterval(displayTimer, 1000);
+ 
+  
   const btnUI = document.getElementById('btn-open');
-  const btnOpenConfig = document.getElementById('button-config');
-  const btnCloseConfig = document.getElementById('button-close');
-  const overlayClick = document.querySelector('.tiktok-music-overlay');
-  const apiConfig = JSON.parse(localStorage.getItem('apiConfig'));
-
-  function closeConfig() {
-    document.querySelector('#div-config').classList.remove('show');
-    document.querySelector('.tiktok-music-overlay').classList.remove('visibility');
-  };
-
-  btnUI.onclick = function () {
+  btnUI.addEventListener('click', function () {
+    const frame = document.getElementById('tiktok-music-wrapper');
     btnUI.classList.toggle('visibility');
-    frameUI.classList.toggle('visibility');
-    loadConfig();
-    if (!frameUI.classList.contains('visibility')) {
-      closeConfig();
+    frame.classList.toggle('visibility');
+  })
+  
+  const btnRandom = document.getElementById('random-song');
+  btnRandom.addEventListener('click', function(){
+    if(isRandom === false){
+      isRandom = true 
+      this.setAttribute('data-control-random','enable');
+    }else{
+      isRandom = false;
+      this.setAttribute('data-control-random','disable');
     }
-  }
-  btnOpenConfig.onclick = function () {
-    document.querySelector('#div-config').classList.toggle('show');
-    document.querySelector('.tiktok-music-overlay').classList.toggle('visibility');
-  };
-
-  btnCloseConfig.onclick = function () {
-    closeConfig();
-  }
-
-  overlayClick.onclick = function () {
-    closeConfig();
-  }
-
-  function loadConfig() {
-    document.querySelector('#api-host').value = apiConfig.host;
-    document.querySelector('#api-key').value = apiConfig.key;
-  }
-
-  function saveConfig() {
-    const apiHost = document.getElementById('api-host');
-    const apiKey = document.getElementById('api-key');
-    if (apiHost.value === '' || apiKey.value === '') {
-      alert('Value not empty');
-      apiHost.value === '' ? apiHost.focus() : apiKey.focus();
+  });
+  
+  const btnRepeat = document.getElementById('repeat-song');
+  btnRepeat.addEventListener('click', function(){
+    if(isRepeatAll !== true && isRepeat1 !== true){
+      isRepeatAll = true;
+      this.setAttribute('data-control-repeat','all');
+      tippy('#reapet-song',{content: 'Repeat All',});
+    }else if(isRepeatAll === true && isRepeat1 === false){
+      isRepeatAll = isRepeat1;
+      isRepeat1 = true;
+      this.setAttribute('data-control-repeat','again');
+      this.innerHTML = '<span><i class="fas fa-repeat-1"></i></span>'
+    }else{
+      isRepeat1 = false;
+      this.setAttribute('data-control-repeat','disable');
+      this.innerHTML = '<span><i class="fas fa-repeat"></i></span>'
     }
-    const apiInfor = {
-      host: apiHost.value,
-      key: apiKey.value
+  })
+  
+  const btnPlay = document.getElementById('play-song');
+  function playPauseSong(){
+    audio.src = listSong[indexCurrent].music.play_url.uri;
+    if(isPlay === true){
+      audio.play();
+      btnPlay.innerHTML = `<span><i class='fas fa-pause'></i></span>`;
+    }else{
+      audio.pause();
+      btnPlay.innerHTML = `<span><i class='fas fa-play'></i></span>`;
     }
-    localStorage.setItem('apiConfig', JSON.stringify(apiInfor));
-    alert('Đã lưu! Nhấn OK để tải lại trang!');
-    location.reload();
+    addAnimation();
   }
-
-  const playPauseSong = document.getElementById('main-player');
-  playPauseSong.onclick = function () {
-    const thumbnail = document.querySelector('.play-song .thumbnail');
-    playPauseSong.classList.toggle('playing');
-    if (playPauseSong.classList.contains('playing')) {
-      thumbnail.style.animationPlayState = 'running';
-      playPauseSong.innerHTML = "<span><i class='fas fa-pause'></i></span>"
-    } else {
-      thumbnail.style.animationPlayState = 'paused';
-      playPauseSong.innerHTML = "<span><i class='fas fa-play'></i></span>"
+  btnPlay.onclick = function(){
+    isPlay === true ? isPlay = false : isPlay = true;
+    if(isFirst === true) {
+      audio.src = listSong[indexCurrent].music.play_url.uri;
+      isFirst = false;
     }
-
-  };
-  const randomSong = document.getElementById('random-song')
-  randomSong.onclick = function () {
-    randomSong.getAttribute('data-control-random') === "disable" ? randomSong.setAttribute('data-control-random', 'enable') : randomSong.setAttribute('data-control-random', 'disable');
-  };
-
-  const repeatSong = document.getElementById('repeat-song')
-  repeatSong.onclick = function () {
-    repeatSong.getAttribute('data-control-repeat') === "disable" ? repeatSong.setAttribute('data-control-repeat', 'all') : repeatSong.getAttribute('data-control-repeat') === "all" ? repeatSong.setAttribute('data-control-repeat', 'again') : repeatSong.setAttribute('data-control-repeat', 'disable');
-    if (repeatSong.getAttribute('data-control-repeat') === "again") {
-      repeatSong.innerHTML = '<span><i class="fas fa-repeat-1"></i></span>';
-    } else {
-      repeatSong.innerHTML = '<span><i class="fas fa-repeat"></i></span>';
+    if(isPlay === true){
+      audio.play();
+      btnPlay.innerHTML = `<span><i class='fas fa-pause'></i></span>`;
+      addAnimation();      
+    }else{
+      audio.pause();
+      btnPlay.innerHTML = `<span><i class='fas fa-play'></i></span>`;
+      removeAnimation();
     }
   };
+  
+  function random(){
+    return Math.floor(Math.random() * listSong.length);
+  }
+  
+  function unique(arr) {
+    return Array.from(new Set(arr))
+  }
+  
+  const btnNext = document.getElementById('next-song');
+  function nextSong(){
+    if(isRepeat1 === false){
+      if(indexCurrent < listSong.length - 1){
+        indexCurrent++;
+      }else{
+        if(!isRepeatAll){
+          alert(`Can't skip to the next track. This is the last song of the playlist`);
+        }else{
+          indexCurrent = 0;
+        }
+      }      
+      if(isRandom){
+        indexCurrent = random();
+      }
+    }
+    isPlay = true;
+    getTitleSong();
+    playPauseSong();
+  }
+  btnNext.addEventListener('click', nextSong);
+  audio.addEventListener('ended', function(){
+    if(isRepeat1) indexCurrent = indexCurrent;
+    if(isRandom) indexCurrent = random();
+    if(indexCurrent === (listSong.length - 1) && isRepeatAll){
+      indexCurrent = -1;
+    }else{
+      isPlay = false;
+      playPauseSong();
+      removeAnimation();
+    }
+    isPlay = true;
+    indexCurrent++;
+    getTitleSong();
+    playPauseSong();
+  }); 
+  
+  const btnPrev = document.getElementById('previous-song');
+  function prevSong(){
+    if(isRepeat1 === false){
+      if(indexCurrent === 0 ){
+        if(!isRepeatAll){
+          alert(`Can't back to the previous track. This is the first song of the playlist`);
+        }else{
+          indexCurrent = listSong.length - 1;          
+        }
+      }else{
+        indexCurrent--;              
+      }
+      if(isRandom){
+        indexCurrent = random();
+      }
+    }
+    isPlay = true;
+    getTitleSong();
+    playPauseSong();
+  }
+  btnPrev.addEventListener('click', prevSong);
+  
+  function playSongInPlaylist(){
+    const li = document.querySelectorAll('.music-item');
+    li.forEach(item => {
+      item.addEventListener('click', function(){
+        removeAnimation();
+        item.classList.add('playing');
+        const id_source = item.getAttribute('data-source').split('-');
+        indexCurrent = parseInt(id_source[1]);
+        isPlay = true;
+        getTitleSong();
+        playPauseSong();
+      })
+    })
+  }
+  
+  function getUser() {
+    const username = window.location.href.split("@");
+    const url =
+      "https://tiktok28.p.rapidapi.com/profile/@" +
+      username[1] +
+      "?schemaType=1";
+    const data = null;
+    const xhr = new XMLHttpRequest();
+    xhr.withCredentials = true;
+    xhr.onload = function(){
+      const json_details = JSON.parse(this.responseText);
+      getListSong(json_details.user);
+    }
+    xhr.open("GET", url);
+    xhr.setRequestHeader("x-rapidapi-host", "tiktok28.p.rapidapi.com");
+    xhr.setRequestHeader("x-rapidapi-key", apiConfig.key);
+    xhr.send(data);
+  }
+
+  function getListSong(user) {
+    const url = `https://tiktok-all-in-one.p.rapidapi.com/user/videos?id=${user.id}&max_cursor=1632138733000`;
+    fetch(url,
+      {
+        method: "GET",
+        headers: {
+          "x-rapidapi-host": apiConfig.host,
+          "x-rapidapi-key": apiConfig.key
+        }
+      }
+    )
+      .then((response) => { return response.json() })
+      .then((data) => {
+        if(data.aweme_list !== null){
+          const listRemoveNull = data.aweme_list.filter(function(e) {
+              return e.music.play_url.uri !== '';
+          });
+          listSong = [
+            ...new Map(listRemoveNull.map((item) => [item.music.id, item])).values(),
+          ];
+          var musicItem = '';
+          listSong.forEach((item, index) => {
+            musicItem += `<li class="music-item song-${index}" data-source="source-${index}"><div class="music-item-wrapper"><div class="music-avt rounded-circle"><span class="avt-icon"><i class="fas fa-music"></i></span></div><div class="music-content"><div class="song-info"><span class="song-title">${item.music.title}</span><span class="song-artist">Artist: ${item.music.author !== '' ? item.music.author : 'empty' }</span><span class="song-album">Album: ${item.music.album !== '' ? item.music.album : 'empty' }</span></div></div><div class="action-play-gif"><i class="action-play-icon"></i></div></div></li>`;
+          });
+          document.querySelector('.music-list').innerHTML = musicItem;
+          playSongInPlaylist();
+        }else{
+          alert(`A song is not currently available in user ${user.uniqueId}`);
+        }
+        getTitleSong();
+        displayTimer();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+  
+  $('#get-list-song').click(function () {
+    getUser();
+    document.querySelector('.play-song').classList.add("hidden-before");
+  });
+  
   function initUI() {
     const btnUI = `
     <div id="btn-open">
@@ -144,10 +345,25 @@
     </div>;`;
     const root = `
     <div class="tiktok-music-overlay"></div>
+    <div class="" id="div-config">
+      <div>
+        <button class="button" type="button" id="button-close">
+          <svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg" data-svg="close-icon"><line fill="none" stroke="#fff" stroke-width="1.1" x1="1" y1="1" x2="13" y2="13"></line><line fill="none" stroke="#fff" stroke-width="1.1" x1="13" y1="1" x2="1" y2="13"></line></svg>
+        </button>
+        <div class="config-wrapper">
+          <label class="text-white">X-RapidAPI-Host</label>
+          <input type="text" id="api-host">
+          <label class="text-white">X-RapidAPI-Key</label>
+          <input type="text" id="api-key">
+          <button type="button" class="button button-save-config" onclick="saveConfig()">SAVE</button>                      
+        </div>
+      </div>
+    </div>
     <div id="tiktok-music-wrapper">
         <div id="btn-open"></div>
-        <div class="player-header">            
-            <div class="thumbnail rounded-circle">
+        <div class="wrapper-player">
+        <div class="player-header justify-content-center">            
+            <div class="thumbnail rounded-circle d-none">
                 <svg width="28" height="32" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
                     <g class="layer" fill="white">
                         <title>Layer 1</title>
@@ -159,36 +375,18 @@
             </div>
             <h4>Tiktok musicplayer</h4>
 
-            <div class="nav-config">
+            <div class="nav-config d-none">
                 <button id="button-config" class="navbar-toggler btn-header" type="button">
                     <span class="text-white">
                         <i class="fas fa-bars fa-1x"></i>
                     </span>
                 </button>
-                <div class="" id="div-config">
-                    <div>
-                        <button class="button" type="button" id="button-close">
-                            <svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"
-                                data-svg="close-icon">
-                                <line fill="none" stroke="#999" stroke-width="1.1" x1="1" y1="1" x2="13" y2="13"></line>
-                                <line fill="none" stroke="#999" stroke-width="1.1" x1="13" y1="1" x2="1" y2="13"></line>
-                            </svg>
-                        </button>
-                        <div class="config-wrapper">
-                            <label>X-RapidAPI-Host</label>
-                            <input type="text" id="api-host">
-                            <label>X-RapidAPI-Key</label>
-                            <input type="text" id="api-key">
-                            <button type="button" class="button button-save-config" onclick="saveConfig()">SAVE</button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
-        <div class="player-body">
+        <div class="player-body pb-2">
             <div class="container">
-                <div >
-
+                <div class="title-song text-capitalize" style="white-space:nowrap;text-overflow:ellipsis">
+                  <span>Name: Empty</span>
                 </div>
                 <div class="play-song">
                     <div class="thumbnail rounded-circle">                    
@@ -214,6 +412,7 @@
                     </div>
                     <div class="controls-main">
                         <div class="player-controls">
+                            <audio id="audio" preload="none"></audio>
                             <div class="controls-advenced" id="random-song" data-control-random="disable">
                                 <span><i class="fas fa-random"></i></span>
                             </div>
@@ -223,7 +422,7 @@
                             <div class="controls-default" id="fast-backward-song">
                                 <span><i class="fas fa-fast-backward"></i></span>
                             </div>
-                            <div class="controls-default" id="main-player">
+                            <div class="controls-default" id="play-song">
                                 <span><i class="fas fa-play"></i></span>
                             </div>
                             <div class="controls-default" id="fast-forward-song">
@@ -236,103 +435,68 @@
                                 <span><i class="fas fa-repeat"></i></span>
                             </div>
                         </div>
-                        <div class="player-timeline"></div>
+                        
                     </div>
+                  <div class="player-timeline">
+                    <!--<div class="timeline-bar"></div> -->
+                    <input class="timeline-bar" type="range"/>
+                    <span class="start-time">00:00</span><span class="end-time">00:00</span>
+                  </div>
                 </div>
                 <div class="playlist">
-                    <a class="text-white cursor-pointer py-1 mb-2 d-block border-bottom border-white" id="get-list-song" href="#">Get List Song</a>
+                    <a class="text-white cursor-pointer d-block border-top border-bottom border-white" id="get-list-song" href="#">Get List Song</a>
                     <ul class="music-list m-0 p-0">
                                            
                     </ul>
                 </div>
             </div>
         </div>
+        </div>
     </div>
     `;
     //$(btnUI).appendTo(body);
     $(root).appendTo(body);
     console.log("inject");
-  }
+  } 
+  
+   /* ---  Function open/close menu config  --- */
+  const btnOpenConfig = document.getElementById('button-config');
+  const btnCloseConfig = document.getElementById('button-close');
+  const overlay = document.querySelector('.tiktok-music-overlay');
+  const divConfig = document.querySelector('#div-config')
+  btnCloseConfig.addEventListener('click', toggleMenuConfig);
+  btnOpenConfig.addEventListener('click', toggleMenuConfig);
+  overlay.addEventListener('click', toggleMenuConfig);
+  
+  function toggleMenuConfig() {
+    divConfig.classList.toggle('show');
+    overlay.classList.toggle('visibility');
+  };
 
-  function getUserId() {
-    const username = window.location.href.split("@");
-    const url =
-      "https://tiktok28.p.rapidapi.com/profile/@" +
-      username[1] +
-      "?schemaType=1";
-    fetch(url, {
-      method: "GET",
-      headers: {
-        "x-rapidapi-host": "tiktok28.p.rapidapi.com",
-        "x-rapidapi-key": apiConfig.key
-      },
-    })
-      .then((response) => { return response.json() })
-      .then((data) => {
-        // console.log(data.user.id);
-        getListSong(data.user.id);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  function loadConfig() {
+      document.querySelector('#api-host').value = apiConfig.host;
+      document.querySelector('#api-key').value = apiConfig.key;
   }
-
-  function getListSong(user_id) {
-    const url = `https://tiktok-all-in-one.p.rapidapi.com/user/videos?id=${user_id}&max_cursor=1632138733000`;
-    fetch(url,
-      {
-        method: "GET",
-        headers: {
-          "x-rapidapi-host": apiConfig.host,
-          "x-rapidapi-key": apiConfig.key
-        }
+  
+  function saveConfig() {
+      const apiHost = document.getElementById('api-host');
+      const apiKey = document.getElementById('api-key');
+      if (apiHost.value === '' || apiKey.value === '') {
+        alert('Value not empty');
+        apiHost.value === '' ? apiHost.focus() : apiKey.focus();
       }
-    )
-      .then((response) => { return response.json() })
-      .then((data) => {
-        $('.music-list').empty();
-        $('.music-list').html(loadSongToHTML(data.aweme_list));
-        const listSong = document.querySelectorAll('.music-item');
-        listSong.forEach((item) => item.addEventListener('click', () => {
-          const el = document.querySelector('.music-item.playing');
-          if (el !== null) {
-            el.classList.remove('playing');
-            el.childNodes[0].removeChild(el.childNodes[0].lastElementChild);
-          }
-          item.classList.add('playing');
-          const childEle = document.createElement('div');
-          childEle.classList.add('action-play-gif');
-          childEle.innerHTML = '<i class="action-play-icon"></i>'
-          item.childNodes[0].appendChild(childEle);
-          // console.log(item, childEle);
-        }));
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
-
-  function loadSongToHTML(aweme_list) {
-    var list = '';
-    if (aweme_list === null) {
-      list += 'Not found music from this user '
-    }
-    aweme_list.forEach(item => {
-      list += `<li class="music-item" data-url-song="${item.music.play_url.uri}"><div class="music-item-wrapper"><div class="music-avt rounded-circle"><span class="avt-icon"><i class="fas fa-music"></i></span></div><div class="music-content"><div class="song-info"><span class="song-title">${item.music.title}</span><span class="song-artist">${item.music.author}</span><span class="song-album">${item.music.album}</span></div></div></div></li>`;
-    });
-    return list;
-  }
-
-  $('#get-list-song').click(function () {
-    getUserId();
-  });
+      const apiInfor = {
+        host: apiHost.value,
+        key: apiKey.value
+      }
+      localStorage.setItem('apiConfig', JSON.stringify(apiInfor));
+      alert('Đã lưu! Nhấn OK để tải lại trang!');
+      location.reload();
+  }  
+  /* ---  [END] Function open/close menu config  --- */
 })();
 
-
-function importJs() {
-  const inject = `
-    
-    `;
+function importScriptContents(inject) {
   var script = window.document.createElement("script");
   script.type = "text/javascript";
   script.innerHTML = inject;
@@ -340,11 +504,6 @@ function importJs() {
 }
 
 function loadCSS(url) {
-  /*var meta = window.document.createElement("meta");
-  meta.setAttribute("http-equiv", "Access-Control-Allow-Origin");
-  meta.setAttribute("content", "*");
-  document.getElementsByTagName("HEAD")[0].appendChild(meta);*/
-
   var link = window.document.createElement("link");
   link.rel = "stylesheet";
   link.type = "text/css";
@@ -383,3 +542,5 @@ function importLink(type, url, integrity) {
     document.body.appendChild(link);
   }
 }
+
+
